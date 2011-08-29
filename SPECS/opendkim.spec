@@ -14,7 +14,7 @@ Requires (pre): shadow-utils
 Requires (post): chkconfig
 Requires (preun): chkconfig, initscripts
 Requires (postun): initscripts
-BuildRequires: sendmail-devel, openssl-devel, libtool, pkgconfig
+BuildRequires: sendmail-devel, openssl-devel, pkgconfig
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Patch0: %{name}-%{version}-initscript.patch
 Patch1: %{name}-%{version}-installreadme.patch
@@ -55,14 +55,13 @@ required for developing applications against libopendkim.
 
 %build
 %configure --enable-stats
+sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
+sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 
 %install
 rm -rf %{buildroot}
 
-# Always use system libtool instead of opendkim provided one
-%global LIBTOOL LIBTOOL=`which libtool`
-
-make DESTDIR=%{buildroot} install %{?_smp_mflags} %{LIBTOOL}
+make DESTDIR=%{buildroot} install %{?_smp_mflags}
 mkdir -p %{buildroot}%{_sysconfdir}
 mkdir -p %{buildroot}%{_initrddir}
 install -m 0755 contrib/init/redhat/opendkim %{buildroot}%{_initrddir}/%{name}
